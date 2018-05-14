@@ -25,27 +25,16 @@ vec = TfidfVectorizer(ngram_range=(1,2), tokenizer=tokenize,
 trainVector = vec.fit_transform(train['project_description'])
 testVector = vec.transform(test['project_description'])
 
-def pr(y_i, y):
-    p = trainVector[y==y_i].sum(0)
-    return (p+1) / ((y==y_i).sum()+1)
-
-# here we get the model we are building
-def build_model(y):
-    y = y.values
-    r = np.log(pr(1,y) / pr(0,y))
-    m = LogisticRegression(C=4, dual=True)
-    x_nb = trainVector.multiply(r)
-    return m.fit(x_nb, y), r
-
 trainOutcomes = train['project_is_approved']
 testOutcomes = test['project_is_approved']
 
-m,r = build_model(trainOutcomes)
-preds = m.predict_proba(testVector.multiply(r))[:,1] # check what this does
+# build our model
+model = LogisticRegression(C=4, dual=True).fit(trainVector, trainOutcomes.values)
+predictions = model.predict_proba(testVector)[:,1]
 
 # here we compare the prediction probabilities from our test set to the actual values 'testOutcomes'
 # we will use the mean squared error formula to compare our results
 
-meanSquaredError = np.sum(np.square(testOutcomes.values - preds))/preds.size
+meanSquaredError = np.sum(np.square(testOutcomes.values - predictions))/predictions.size
 
 print(meanSquaredError)
