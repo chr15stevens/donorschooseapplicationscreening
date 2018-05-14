@@ -1,6 +1,6 @@
 import numpy as np, pandas as pd
 from sklearn.linear_model import LogisticRegression
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 import re, string
 
 # a regex to replace all punctuation within a string
@@ -21,7 +21,7 @@ print(train.head())
 # We are using the TFIDF vectorizer to change our text into vectors of counts of words vs their appearances in documents
 vec = TfidfVectorizer(ngram_range=(1,2), tokenizer=tokenize,
                min_df=3, max_df=0.9, strip_accents='unicode', use_idf=1,
-               smooth_idf=1, sublinear_tf=1 )
+               smooth_idf=1, sublinear_tf=1) # use max_features=1000 to restrict the number of words you want to consider
 trainVector = vec.fit_transform(train['project_description'])
 testVector = vec.transform(test['project_description'])
 
